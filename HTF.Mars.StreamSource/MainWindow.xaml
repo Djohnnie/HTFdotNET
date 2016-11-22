@@ -1,0 +1,100 @@
+﻿<Window x:Class="HTF.Mars.StreamSource.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:HTF.Mars.StreamSource"
+        mc:Ignorable="d" Background="Black"
+        Title="Mars - Dusty Drones - StreamService configuration" MinHeight="768" MinWidth="1366" Height="768" Width="1366" Icon="graphics/drone.ico">
+    <Window.DataContext>
+        <local:MainWindowViewModel />
+    </Window.DataContext>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition />
+            <ColumnDefinition Width="30" />
+        </Grid.ColumnDefinitions>
+        <MediaElement Name="myMediaElement" Grid.Column="0" Grid.ColumnSpan="3" Stretch="UniformToFill">
+            <MediaElement.Triggers>
+                <EventTrigger RoutedEvent="MediaElement.Loaded">
+                    <EventTrigger.Actions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <MediaTimeline Source="graphics/background.mp4" Storyboard.TargetName="myMediaElement" RepeatBehavior="Forever" />
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger.Actions>
+                </EventTrigger>
+            </MediaElement.Triggers>
+        </MediaElement>
+        <ItemsControl Grid.Column="0" ItemsSource="{Binding BSLeft}" HorizontalAlignment="Center">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="#44ADFF2F" FontSize="20" Background="Transparent" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="70" />
+                <RowDefinition />
+                <RowDefinition Height="20" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Border Grid.Row="0" Margin="15" BorderBrush="#00FEFC" BorderThickness="3" CornerRadius="0,50,0,50">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition />
+                            <RowDefinition Height="30" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="5" Text="{Binding FileTitle.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" Text="{Binding FileStatus.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                        <Grid Grid.Row="1" VerticalAlignment="Center" Margin="50">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding OutputPath.Value}" Margin="5" VerticalAlignment="Center" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                            <TextBox  Grid.Column="1" Text="{Binding PathOutput, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="5" BorderThickness="0" Background="#00FEFC" Foreground="Black" FontSize="20" FontFamily="Consolas" />
+                        </Grid>
+                    </Grid>
+                </Border>
+                <Border Grid.Row="1" Margin="15" BorderBrush="#00FEFC" BorderThickness="3" CornerRadius="0,50,0,50">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30" />
+                            <RowDefinition />
+                            <RowDefinition Height="30" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="5" Text="{Binding WebTitle.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" Text="{Binding WebStatus.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                        <Grid Grid.Row="1" VerticalAlignment="Center" Margin="50">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding OutputHttp.Value}" Margin="5" VerticalAlignment="Center" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                            <TextBox  Grid.Column="1" Text="{Binding HttpOutput, UpdateSourceTrigger=PropertyChanged}" Margin="5" Padding="5" BorderThickness="0" Background="#00FEFC" Foreground="Black" FontSize="20" FontFamily="Consolas" />
+                        </Grid>
+                    </Grid>
+                </Border>
+            </Grid>
+            <TextBlock Grid.Column="0" Grid.Row="0" Margin="10" Text="{Binding Title.Value}" Foreground="#00FEFC" FontSize="42" FontFamily="Consolas" />
+            <TextBlock Grid.Column="0" Grid.Row="2" Margin="3" HorizontalAlignment="Left" Text="{Binding Footer1.Value}" Foreground="#00FEFC" FontSize="12" FontFamily="Consolas" />
+            <TextBlock Grid.Column="0" Grid.Row="2" Margin="3" HorizontalAlignment="Right" Text="{Binding Footer2.Value}" Foreground="#00FEFC" FontSize="12" FontFamily="Consolas" />
+        </Grid>
+        <ItemsControl Grid.Column="2" ItemsSource="{Binding BSRight}" HorizontalAlignment="Center">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="#44ADFF2F" FontSize="20" Background="Transparent" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</Window>
