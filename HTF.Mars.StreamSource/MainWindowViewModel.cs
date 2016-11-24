@@ -1,4 +1,5 @@
 ﻿using System;
+using HTF.Mars.StreamSource.Contracts;
 using HTF.Mars.StreamSource.Core;
 using HTF.Mars.StreamSource.Services;
 using Microsoft.Practices.Unity;
@@ -11,6 +12,8 @@ namespace HTF.Mars.StreamSource
 
         private String[] _bsLeft;
         private String[] _bsRight;
+        private CyrillicString _online;
+        private CyrillicString _offline;
         private CyrillicString _title;
         private CyrillicString _fileTitle;
         private CyrillicString _fileStatus;
@@ -22,6 +25,8 @@ namespace HTF.Mars.StreamSource
         private String _pathOutput;
         private CyrillicString _outputHttp;
         private String _httpOutput;
+        private CyrillicString _fileSamplesReceived;
+        private CyrillicString _webSamplesReceived;
 
         private readonly ICoreService _coreFileService;
         private readonly ICoreService _coreHttpService;
@@ -138,6 +143,10 @@ namespace HTF.Mars.StreamSource
             set
             {
                 _pathOutput = value;
+                if (!String.IsNullOrEmpty(value))
+                {
+                    HttpOutput = String.Empty;
+                }
                 this.NotifyPropertyChanged(x => x.PathOutput);
                 RefreshOutput();
             }
@@ -159,8 +168,32 @@ namespace HTF.Mars.StreamSource
             set
             {
                 _httpOutput = value;
+                if (!String.IsNullOrEmpty(value))
+                {
+                    PathOutput = String.Empty;
+                }
                 this.NotifyPropertyChanged(x => x.HttpOutput);
                 RefreshOutput();
+            }
+        }
+
+        public CyrillicString FileSamplesReceived
+        {
+            get { return _fileSamplesReceived; }
+            set
+            {
+                _fileSamplesReceived = value;
+                this.NotifyPropertyChanged(x => x.FileSamplesReceived);
+            }
+        }
+
+        public CyrillicString WebSamplesReceived
+        {
+            get { return _webSamplesReceived; }
+            set
+            {
+                _webSamplesReceived = value;
+                this.NotifyPropertyChanged(x => x.WebSamplesReceived);
             }
         }
 
@@ -177,21 +210,23 @@ namespace HTF.Mars.StreamSource
             diContainer.RegisterType<ISampleGenerationService, SampleGenerationService>();
             diContainer.RegisterType<IOutputService, FileOutputService>();
             //diContainer.RegisterType<IOutputService, HttpOutputService>("Http");
+            _offline = diContainer.Resolve<CyrillicString>();
+            _offline.Latin = "OFFLINE";
+            _offline.Cyrillic = "ОФФЛИНЕ";
+            _online = diContainer.Resolve<CyrillicString>();
+            _online.Latin = "ONLINE";
+            _online.Cyrillic = "ОНЛИНЕ";
             _title = diContainer.Resolve<CyrillicString>();
             _title.Latin = "Dusty Drones Sensor StreamService Configuration Dashboard";
             _title.Cyrillic = "Дусты Дронес Сенсор СтреамСервице Цонфигуратион Дашбоард";
             _fileTitle = diContainer.Resolve<CyrillicString>();
             _fileTitle.Latin = "Test Interface For File/Binary Based Listeners";
             _fileTitle.Cyrillic = "Тест Интерфаце Фор Филе/Бинары Басед Листенерс";
-            _fileStatus = diContainer.Resolve<CyrillicString>();
-            _fileStatus.Latin = "OFFLINE";
-            _fileStatus.Cyrillic = "ОФФЛИНЕ";
+            _fileStatus = _offline;
             _webTitle = diContainer.Resolve<CyrillicString>();
             _webTitle.Latin = "Test Interface For Web/HTTP Based Listeners";
             _webTitle.Cyrillic = "Тест Интерфаце Фор Үеб/HТТП Басед Листенерс";
-            _webStatus = diContainer.Resolve<CyrillicString>();
-            _webStatus.Latin = "OFFLINE";
-            _webStatus.Cyrillic = "ОФФЛИНЕ";
+            _webStatus = _offline;
             _footer1 = diContainer.Resolve<CyrillicString>();
             _footer1.Latin = "DDSSCD v0.13.267.9782964387";
             _footer1.Cyrillic = "ДДССЦД в0.13.267.9782964387";
@@ -204,10 +239,23 @@ namespace HTF.Mars.StreamSource
             _outputHttp = diContainer.Resolve<CyrillicString>();
             _outputHttp.Latin = "Output HTTP";
             _outputHttp.Cyrillic = "Оутпут HТТП";
+            _fileSamplesReceived = diContainer.Resolve<CyrillicString>();
+            _fileSamplesReceived.Latin = "No samples received";
+            _fileSamplesReceived.Cyrillic = "No samples received";
+            _webSamplesReceived = diContainer.Resolve<CyrillicString>();
+            _webSamplesReceived.Latin = "No samples received";
+            _webSamplesReceived.Cyrillic = "No samples received";
             _timerService = diContainer.Resolve<ITimerService>();
             _timerService.Start(TimeSpan.FromMilliseconds(50), RefreshBullShit);
             _coreFileService = diContainer.Resolve<ICoreService>();
+            _coreFileService.SampleReceived += coreFileService_SampleReceived;
             //_coreHttpService = diContainer.Resolve<ICoreService>();
+        }
+
+        private void coreFileService_SampleReceived(object sender, Sample e)
+        {
+            FileSamplesReceived.Latin = $"{_coreFileService.SamplesGenerated} samples received";
+            FileSamplesReceived.Cyrillic = $"{_coreFileService.SamplesGenerated} samples received";
         }
 
         #endregion
@@ -230,11 +278,14 @@ namespace HTF.Mars.StreamSource
         private void RefreshOutput()
         {
             _coreFileService.Stop();
-            _coreHttpService.Stop();
+            FileStatus = _offline;
+            //_coreHttpService.Stop();
+            WebStatus = _offline;
             if (!String.IsNullOrWhiteSpace(PathOutput) && String.IsNullOrWhiteSpace(HttpOutput))
             {
                 if (_coreFileService.IsValid(PathOutput))
                 {
+                    FileStatus = _online;
                     _coreFileService.Start(PathOutput);
                 }
             }
@@ -242,6 +293,7 @@ namespace HTF.Mars.StreamSource
             {
                 if (_coreFileService.IsValid(HttpOutput))
                 {
+                    WebStatus = _online;
                     _coreHttpService.Start(HttpOutput);
                 }
             }

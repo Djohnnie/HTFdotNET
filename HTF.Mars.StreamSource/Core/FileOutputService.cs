@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using HTF.Mars.StreamSource.Contracts;
@@ -8,20 +9,27 @@ namespace HTF.Mars.StreamSource.Core
 {
     public class FileOutputService : IOutputService
     {
-        public Boolean IsValid(String destination)
+        public Boolean IsValid(String path)
         {
-            return true;
+            return Directory.Exists(path);
         }
 
         public async Task WriteSample(String path, Sample sample)
         {
             if (Directory.Exists(path))
             {
-                var fileName = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-                var serializedSample = SerializeSample(sample);
-                using (StreamWriter streamWriter = new StreamWriter(Path.Combine(path, fileName)))
+                try
                 {
-                    await streamWriter.WriteAsync(serializedSample);
+                    var fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}.json";
+                    var serializedSample = SerializeSample(sample);
+                    using (StreamWriter streamWriter = new StreamWriter(Path.Combine(path, fileName)))
+                    {
+                        await streamWriter.WriteAsync(serializedSample);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
                 }
             }
             else

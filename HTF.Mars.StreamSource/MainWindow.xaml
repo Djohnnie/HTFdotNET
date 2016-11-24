@@ -9,6 +9,13 @@
     <Window.DataContext>
         <local:MainWindowViewModel />
     </Window.DataContext>
+    <Window.Resources>
+        <ResourceDictionary>
+            <local:StatusToColorConverter x:Key="StatusToColorConverter"
+                                          OfflineBrush="DarkRed"
+                                          OnlineBrush="LimeGreen "/>
+        </ResourceDictionary>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="30" />
@@ -54,7 +61,8 @@
                             <RowDefinition Height="30" />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="5" Text="{Binding FileTitle.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
-                        <TextBlock Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" Text="{Binding FileStatus.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" Text="{Binding FileStatus.Value}" Foreground="{Binding FileStatus, Converter={StaticResource StatusToColorConverter}}" FontSize="30" FontFamily="Consolas" />
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,5,5,5" Text="{Binding FileSamplesReceived.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
                         <Grid Grid.Row="1" VerticalAlignment="Center" Margin="50">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
@@ -73,7 +81,8 @@
                             <RowDefinition Height="30" />
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" VerticalAlignment="Center" Margin="5" Text="{Binding WebTitle.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
-                        <TextBlock Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" Text="{Binding WebStatus.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="5" Text="{Binding WebStatus.Value}"  Foreground="{Binding WebStatus, Converter={StaticResource StatusToColorConverter}}" FontSize="30" FontFamily="Consolas" />
+                        <TextBlock Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="40,5,5,5" Text="{Binding WebSamplesReceived.Value}" Foreground="#00FEFC" FontSize="20" FontFamily="Consolas" />
                         <Grid Grid.Row="1" VerticalAlignment="Center" Margin="50">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />

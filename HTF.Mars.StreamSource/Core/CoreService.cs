@@ -18,6 +18,8 @@ namespace HTF.Mars.StreamSource.Core
 
         public event EventHandler<Sample> SampleReceived;
 
+        public Int32 SamplesGenerated { get; set; }
+
         public CoreService(ITimerService timerService, ISampleGenerationService sampleGenerator, IOutputService outputter)
         {
             _timerService = timerService;
@@ -33,6 +35,7 @@ namespace HTF.Mars.StreamSource.Core
         public void Start(String destination)
         {
             _destination = destination;
+            SamplesGenerated = 0;
             _timerToken = _timerService.Start(TimeSpan.FromMilliseconds(1000), Do);
         }
 
@@ -44,6 +47,7 @@ namespace HTF.Mars.StreamSource.Core
         private void Do()
         {
             var sample = _sampleGenerator.GenerateSample(_previousSamples);
+            SamplesGenerated++;
             _previousSamples.Add(sample);
             SampleReceived?.Invoke(this, sample);
             _outputter.WriteSample(_destination, sample);

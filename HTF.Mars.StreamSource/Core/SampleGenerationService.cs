@@ -20,7 +20,13 @@ namespace HTF.Mars.StreamSource.Core
 
         public Sample GenerateSample(IEnumerable<Sample> previousSamples)
         {
-            return new Sample();
+            return new Sample
+            {
+                Temperature = _randomService.RandomDecimal(140, 310),
+                WindOrientation = new Wind { },
+                WindSpeed = _randomService.RandomDecimal(0, 50),
+                ParticleSize = _randomService.RandomDecimal(1, 1000)
+            };
         }
     }
 }

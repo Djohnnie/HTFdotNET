@@ -98,6 +98,7 @@
     <Compile Include="Services\RandomService.cs" />
     <Compile Include="Services\TimerService.cs" />
     <Compile Include="Services\TimerToken.cs" />
+    <Compile Include="StatusToColorConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
