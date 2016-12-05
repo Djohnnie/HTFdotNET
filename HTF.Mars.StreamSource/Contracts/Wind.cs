@@ -4,7 +4,14 @@ namespace HTF.Mars.StreamSource.Contracts
 {
     public class Wind
     {
-        public Int16 Value { get; set; }
+        public Wind(Int32 value)
+        {
+            if (!Enum.IsDefined(typeof(Orientation), value)) throw new ArgumentException("value", nameof(value));
+            Value = value;
+            Orientation = (Orientation)value;
+        }
+
+        public Int32 Value { get; set; }
         public Orientation Orientation { get; set; }
     }
 

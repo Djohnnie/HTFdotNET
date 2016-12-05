@@ -12,12 +12,12 @@ namespace HTF.Mars.StreamSource.Services
 
         public Int32 RandomInt(Int32 min, Int32 max)
         {
-            return _randomGenerator.Next(min, max);
+            return _randomGenerator.Next(min, max + 1);
         }
 
         public Decimal RandomDecimal(Int32 min, Int32 max)
         {
-            return _randomGenerator.Next(min, max);
+            return _randomGenerator.Next(min, max + 1);
         }
     }
 }

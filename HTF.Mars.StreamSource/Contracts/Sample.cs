@@ -35,5 +35,7 @@ namespace HTF.Mars.StreamSource.Contracts
         /// on Mars ranges from 0,010µm to 10µm.
         /// </remarks>
         public Decimal ParticleSize { get; set; }
+
+        public Boolean IsBogus { get; set; }
     }
 }
