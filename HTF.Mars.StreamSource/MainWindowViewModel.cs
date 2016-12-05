@@ -208,8 +208,8 @@ namespace HTF.Mars.StreamSource
             diContainer.RegisterType<IRandomService, RandomService>(new ContainerControlledLifetimeManager());
             diContainer.RegisterType<ICoreService, CoreService>();
             diContainer.RegisterType<ISampleGenerationService, SampleGenerationService>();
-            diContainer.RegisterType<IOutputService, FileOutputService>();
-            //diContainer.RegisterType<IOutputService, HttpOutputService>("Http");
+            //diContainer.RegisterType<IOutputService, FileOutputService>();
+            diContainer.RegisterType<IOutputService, HttpOutputService>();
             _offline = diContainer.Resolve<CyrillicString>();
             _offline.Latin = "OFFLINE";
             _offline.Cyrillic = "ОФФЛИНЕ";
@@ -249,13 +249,20 @@ namespace HTF.Mars.StreamSource
             _timerService.Start(TimeSpan.FromMilliseconds(50), RefreshBullShit);
             _coreFileService = diContainer.Resolve<ICoreService>();
             _coreFileService.SampleReceived += coreFileService_SampleReceived;
-            //_coreHttpService = diContainer.Resolve<ICoreService>();
+            _coreHttpService = diContainer.Resolve<ICoreService>();
+            _coreHttpService.SampleReceived += coreHttpService_SampleReceived;
         }
 
         private void coreFileService_SampleReceived(object sender, Sample e)
         {
             FileSamplesReceived.Latin = $"{_coreFileService.SamplesGenerated} samples received";
             FileSamplesReceived.Cyrillic = $"{_coreFileService.SamplesGenerated} samples received";
+        }
+
+        private void coreHttpService_SampleReceived(object sender, Sample e)
+        {
+            WebSamplesReceived.Latin = $"{_coreHttpService.SamplesGenerated} samples received";
+            WebSamplesReceived.Cyrillic = $"{_coreHttpService.SamplesGenerated} samples received";
         }
 
         #endregion
@@ -291,7 +298,7 @@ namespace HTF.Mars.StreamSource
             }
             if (!String.IsNullOrWhiteSpace(HttpOutput) && String.IsNullOrWhiteSpace(PathOutput))
             {
-                if (_coreFileService.IsValid(HttpOutput))
+                if (_coreHttpService.IsValid(HttpOutput))
                 {
                     WebStatus = _online;
                     _coreHttpService.Start(HttpOutput);

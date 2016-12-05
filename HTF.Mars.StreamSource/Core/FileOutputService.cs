@@ -20,7 +20,7 @@ namespace HTF.Mars.StreamSource.Core
             {
                 try
                 {
-                    var fileName = $"{DateTime.Now:yyyyMMddHHmmssfff}.json";
+                    var fileName = $"{sample.TimeStamp:yyyyMMddHHmmssfff}.json";
                     var serializedSample = SerializeSample(sample);
                     using (StreamWriter streamWriter = new StreamWriter(Path.Combine(path, fileName)))
                     {

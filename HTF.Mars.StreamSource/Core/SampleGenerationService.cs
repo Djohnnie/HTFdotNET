@@ -24,7 +24,8 @@ namespace HTF.Mars.StreamSource.Core
                 Temperature = _randomService.RandomDecimal(140, 310),
                 WindOrientation = new Wind(0),
                 WindSpeed = _randomService.RandomDecimal(0, 50),
-                ParticleSize = _randomService.RandomDecimal(1, 1000)
+                ParticleSize = _randomService.RandomDecimal(1, 1000),
+                TimeStamp = DateTime.UtcNow
             };
         }
 
@@ -44,7 +45,8 @@ namespace HTF.Mars.StreamSource.Core
                 WindOrientation = new Wind(wind),
                 WindSpeed = windSpeed,
                 ParticleSize = particleSize,
-                IsBogus = shouldGenerateBogusSample
+                IsBogus = shouldGenerateBogusSample,
+                TimeStamp = DateTime.UtcNow
             };
         }
 

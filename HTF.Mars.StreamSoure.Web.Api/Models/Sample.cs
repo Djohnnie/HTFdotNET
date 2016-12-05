@@ -1,7 +1,6 @@
 ﻿using System;
-using Newtonsoft.Json;
 
-namespace HTF.Mars.StreamSource.Contracts
+namespace HTF.Mars.StreamSoure.Web.Api.Models
 {
     public class Sample
     {
@@ -41,8 +40,5 @@ namespace HTF.Mars.StreamSource.Contracts
         /// Gets or sets the time stamp.
         /// </summary>
         public DateTime TimeStamp { get; set; }
-
-        [JsonIgnore]
-        public Boolean IsBogus { get; set; }
     }
 }
