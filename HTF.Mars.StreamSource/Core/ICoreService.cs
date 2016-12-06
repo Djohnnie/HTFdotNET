@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using HTF.Mars.StreamSource.Contracts;
 
 namespace HTF.Mars.StreamSource.Core
@@ -7,7 +8,7 @@ namespace HTF.Mars.StreamSource.Core
     {
         event EventHandler<Sample> SampleReceived;
         Int32 SamplesGenerated { get; set; }
-        Boolean IsValid(String destination);
+        Task<Boolean> IsValid(String destination);
         void Start(String destination);
         void Stop();
     }

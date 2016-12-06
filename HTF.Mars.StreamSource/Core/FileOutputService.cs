@@ -9,9 +9,9 @@ namespace HTF.Mars.StreamSource.Core
 {
     public class FileOutputService : IOutputService
     {
-        public Boolean IsValid(String path)
+        public async Task<Boolean> IsValid(String path)
         {
-            return Directory.Exists(path);
+            return await Task.Run(() => Directory.Exists(path));
         }
 
         public async Task WriteSample(String path, Sample sample)

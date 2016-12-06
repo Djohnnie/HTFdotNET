@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using HTF.Mars.StreamSource.Contracts;
 using HTF.Mars.StreamSource.Services;
 
@@ -27,7 +28,7 @@ namespace HTF.Mars.StreamSource.Core
             _outputter = outputter;
         }
 
-        public Boolean IsValid(String destination)
+        public Task<Boolean> IsValid(String destination)
         {
             return _outputter.IsValid(destination);
         }
@@ -35,13 +36,18 @@ namespace HTF.Mars.StreamSource.Core
         public void Start(String destination)
         {
             _destination = destination;
-            SamplesGenerated = 0;
-            _timerToken = _timerService.Start(TimeSpan.FromMilliseconds(1000), Do);
+            if (_timerToken == null)
+            {
+                _timerToken = _timerService.Start(TimeSpan.FromMilliseconds(1000), Do);
+            }
         }
 
         public void Stop()
         {
             _timerToken?.Stop();
+            _timerToken = null;
+            SamplesGenerated = 0;
+            SampleReceived?.Invoke(this, null);
         }
 
         private void Do()

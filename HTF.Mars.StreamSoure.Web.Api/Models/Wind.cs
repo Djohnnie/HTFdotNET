@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace HTF.Mars.StreamSoure.Web.Api.Models
 {
@@ -12,6 +14,8 @@ namespace HTF.Mars.StreamSoure.Web.Api.Models
         }
 
         public Int32 Value { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public Orientation Orientation { get; set; }
     }
 

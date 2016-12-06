@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using HTF.Mars.StreamSource.Contracts;
 using HTF.Mars.StreamSource.Core;
 using HTF.Mars.StreamSource.Services;
@@ -8,6 +9,24 @@ namespace HTF.Mars.StreamSource
 {
     public class MainWindowViewModel : ObservableBase
     {
+        #region -_ Private Events _-
+
+        private event EventHandler PathOutputChanged;
+
+        private void RaisePathOutputChanged()
+        {
+            PathOutputChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private event EventHandler HttpOutputChanged;
+
+        private void RaiseHttpOutputChanged()
+        {
+            HttpOutputChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        #endregion
+
         #region [ Private Members ]
 
         private String[] _bsLeft;
@@ -145,10 +164,11 @@ namespace HTF.Mars.StreamSource
                 _pathOutput = value;
                 if (!String.IsNullOrEmpty(value))
                 {
-                    HttpOutput = String.Empty;
+                    _httpOutput = String.Empty;
+                    this.NotifyPropertyChanged(x => x.HttpOutput);
                 }
                 this.NotifyPropertyChanged(x => x.PathOutput);
-                RefreshOutput();
+                RaisePathOutputChanged();
             }
         }
 
@@ -170,10 +190,11 @@ namespace HTF.Mars.StreamSource
                 _httpOutput = value;
                 if (!String.IsNullOrEmpty(value))
                 {
-                    PathOutput = String.Empty;
+                    _pathOutput = String.Empty;
+                    this.NotifyPropertyChanged(x => x.PathOutput);
                 }
                 this.NotifyPropertyChanged(x => x.HttpOutput);
-                RefreshOutput();
+                RaiseHttpOutputChanged();
             }
         }
 
@@ -208,66 +229,68 @@ namespace HTF.Mars.StreamSource
             diContainer.RegisterType<IRandomService, RandomService>(new ContainerControlledLifetimeManager());
             diContainer.RegisterType<ICoreService, CoreService>();
             diContainer.RegisterType<ISampleGenerationService, SampleGenerationService>();
-            //diContainer.RegisterType<IOutputService, FileOutputService>();
-            diContainer.RegisterType<IOutputService, HttpOutputService>();
-            _offline = diContainer.Resolve<CyrillicString>();
-            _offline.Latin = "OFFLINE";
-            _offline.Cyrillic = "ОФФЛИНЕ";
-            _online = diContainer.Resolve<CyrillicString>();
-            _online.Latin = "ONLINE";
-            _online.Cyrillic = "ОНЛИНЕ";
-            _title = diContainer.Resolve<CyrillicString>();
-            _title.Latin = "Dusty Drones Sensor StreamService Configuration Dashboard";
-            _title.Cyrillic = "Дусты Дронес Сенсор СтреамСервице Цонфигуратион Дашбоард";
-            _fileTitle = diContainer.Resolve<CyrillicString>();
-            _fileTitle.Latin = "Test Interface For File/Binary Based Listeners";
-            _fileTitle.Cyrillic = "Тест Интерфаце Фор Филе/Бинары Басед Листенерс";
+
+            _offline = CreateCyrillicString(diContainer, "OFFLINE", "ОФФЛИНЕ");
+            _online = CreateCyrillicString(diContainer, "ONLINE", "ОНЛИНЕ");
+            _title = CreateCyrillicString(diContainer, "Dusty Drones Sensor StreamService Configuration Dashboard", "Дусты Дронес Сенсор СтреамСервице Цонфигуратион Дашбоард");
+            _fileTitle = CreateCyrillicString(diContainer, "Test Interface For File/Binary Based Listeners", "Тест Интерфаце Фор Филе/Бинары Басед Листенерс");
             _fileStatus = _offline;
-            _webTitle = diContainer.Resolve<CyrillicString>();
-            _webTitle.Latin = "Test Interface For Web/HTTP Based Listeners";
-            _webTitle.Cyrillic = "Тест Интерфаце Фор Үеб/HТТП Басед Листенерс";
+            _webTitle = CreateCyrillicString(diContainer, "Test Interface For Web/HTTP Based Listeners", "Тест Интерфаце Фор Үеб/HТТП Басед Листенерс");
             _webStatus = _offline;
-            _footer1 = diContainer.Resolve<CyrillicString>();
-            _footer1.Latin = "DDSSCD v0.13.267.9782964387";
-            _footer1.Cyrillic = "ДДССЦД в0.13.267.9782964387";
-            _footer2 = diContainer.Resolve<CyrillicString>();
-            _footer2.Latin = "DDSSCD is connected to the service backend";
-            _footer2.Cyrillic = "ДДССЦД ис цоннецтед то тhе сервице бацкенд";
-            _outputPath = diContainer.Resolve<CyrillicString>();
-            _outputPath.Latin = "Output Path";
-            _outputPath.Cyrillic = "Оутпут Патh";
-            _outputHttp = diContainer.Resolve<CyrillicString>();
-            _outputHttp.Latin = "Output HTTP";
-            _outputHttp.Cyrillic = "Оутпут HТТП";
-            _fileSamplesReceived = diContainer.Resolve<CyrillicString>();
-            _fileSamplesReceived.Latin = "No samples received";
-            _fileSamplesReceived.Cyrillic = "No samples received";
-            _webSamplesReceived = diContainer.Resolve<CyrillicString>();
-            _webSamplesReceived.Latin = "No samples received";
-            _webSamplesReceived.Cyrillic = "No samples received";
+            _footer1 = CreateCyrillicString(diContainer, "DDSSCD v0.13.267.9782964387", "ДДССЦД в0.13.267.9782964387");
+            _footer2 = CreateCyrillicString(diContainer, "DDSSCD is connected to the service backend", "ДДССЦД ис цоннецтед то тhе сервице бацкенд");
+            _outputPath = CreateCyrillicString(diContainer, "Output Path", "Оутпут Патh");
+            _outputHttp = CreateCyrillicString(diContainer, "Output HTTP", "Оутпут HТТП");
+            _fileSamplesReceived = CreateCyrillicString(diContainer, "No samples received", "Но самплес рецеивед");
+            _webSamplesReceived = CreateCyrillicString(diContainer, "No samples received", "Но самплес рецеивед");
+
             _timerService = diContainer.Resolve<ITimerService>();
             _timerService.Start(TimeSpan.FromMilliseconds(50), RefreshBullShit);
-            _coreFileService = diContainer.Resolve<ICoreService>();
+
+            _coreFileService = diContainer.Resolve<ICoreService>(new DependencyOverride<IOutputService>(new FileOutputService()));
             _coreFileService.SampleReceived += coreFileService_SampleReceived;
-            _coreHttpService = diContainer.Resolve<ICoreService>();
+            _coreHttpService = diContainer.Resolve<ICoreService>(new DependencyOverride<IOutputService>(new HttpOutputService()));
             _coreHttpService.SampleReceived += coreHttpService_SampleReceived;
+
+            Observable.FromEventPattern(x => this.PathOutputChanged += x, x => this.PathOutputChanged -= x)
+                .Throttle(TimeSpan.FromMilliseconds(1000))
+                .ObserveOnDispatcher()
+                .Do(x => RefreshOutput())
+                .Subscribe();
+            Observable.FromEventPattern(x => this.HttpOutputChanged += x, x => this.HttpOutputChanged -= x)
+                .Throttle(TimeSpan.FromMilliseconds(1000))
+                .ObserveOnDispatcher()
+                .Do(x => RefreshOutput())
+                .Subscribe();
         }
 
         private void coreFileService_SampleReceived(object sender, Sample e)
         {
-            FileSamplesReceived.Latin = $"{_coreFileService.SamplesGenerated} samples received";
-            FileSamplesReceived.Cyrillic = $"{_coreFileService.SamplesGenerated} samples received";
+            var fileSamplesGeneratedLatin = _coreFileService.SamplesGenerated == 0 ? "No" : $"{_coreFileService.SamplesGenerated}";
+            var fileSamplesGeneratedCyrillic = _coreFileService.SamplesGenerated == 0 ? "Но" : $"{_coreFileService.SamplesGenerated}";
+            FileSamplesReceived.Latin = $"{fileSamplesGeneratedLatin} samples received";
+            FileSamplesReceived.Cyrillic = $"{fileSamplesGeneratedCyrillic} самплес рецеивед";
         }
 
         private void coreHttpService_SampleReceived(object sender, Sample e)
         {
-            WebSamplesReceived.Latin = $"{_coreHttpService.SamplesGenerated} samples received";
-            WebSamplesReceived.Cyrillic = $"{_coreHttpService.SamplesGenerated} samples received";
+            var webSamplesGeneratedLatin = _coreHttpService.SamplesGenerated == 0 ? "No" : $"{_coreHttpService.SamplesGenerated}";
+            var webSamplesGeneratedCyrillic = _coreHttpService.SamplesGenerated == 0 ? "Но" : $"{_coreHttpService.SamplesGenerated}";
+            WebSamplesReceived.Latin = $"{webSamplesGeneratedLatin} samples received";
+            WebSamplesReceived.Cyrillic = $"{webSamplesGeneratedCyrillic} самплес рецеивед";
         }
 
         #endregion
 
         #region [ Helper Methods ]
+
+        private CyrillicString CreateCyrillicString(UnityContainer diContainer, String latin, String cyrillic)
+        {
+            var cyrillicString = diContainer.Resolve<CyrillicString>();
+            cyrillicString.Latin = latin;
+            cyrillicString.Cyrillic = cyrillic;
+            return cyrillicString;
+        }
 
         private void RefreshBullShit()
         {
@@ -282,15 +305,15 @@ namespace HTF.Mars.StreamSource
             BSRight = bsRight;
         }
 
-        private void RefreshOutput()
+        private async void RefreshOutput()
         {
             _coreFileService.Stop();
             FileStatus = _offline;
-            //_coreHttpService.Stop();
+            _coreHttpService.Stop();
             WebStatus = _offline;
             if (!String.IsNullOrWhiteSpace(PathOutput) && String.IsNullOrWhiteSpace(HttpOutput))
             {
-                if (_coreFileService.IsValid(PathOutput))
+                if (await _coreFileService.IsValid(PathOutput))
                 {
                     FileStatus = _online;
                     _coreFileService.Start(PathOutput);
@@ -298,7 +321,7 @@ namespace HTF.Mars.StreamSource
             }
             if (!String.IsNullOrWhiteSpace(HttpOutput) && String.IsNullOrWhiteSpace(PathOutput))
             {
-                if (_coreHttpService.IsValid(HttpOutput))
+                if (await _coreHttpService.IsValid(HttpOutput))
                 {
                     WebStatus = _online;
                     _coreHttpService.Start(HttpOutput);

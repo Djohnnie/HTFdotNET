@@ -10,13 +10,13 @@ namespace HTF.Mars.StreamSource.Core
 {
     public class HttpOutputService : IOutputService
     {
-        public Boolean IsValid(String destination)
+        public async Task<Boolean> IsValid(String destination)
         {
             try
             {
                 var client = new RestClient(destination);
                 var request = new RestRequest(Method.OPTIONS);
-                var result = client.Execute(request);
+                var result = await client.ExecuteTaskAsync(request);
                 return result.StatusCode == HttpStatusCode.OK;
             }
             catch
@@ -27,8 +27,6 @@ namespace HTF.Mars.StreamSource.Core
 
         public async Task WriteSample(String destination, Sample sample)
         {
-            await Task.Delay(1);
-
             try
             {
                 var client = new RestClient(destination);

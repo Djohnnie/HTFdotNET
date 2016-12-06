@@ -6,7 +6,7 @@ namespace HTF.Mars.StreamSource.Core
 {
     public interface IOutputService
     {
-        Boolean IsValid(String destination);
+        Task<Boolean> IsValid(String destination);
         Task WriteSample(String destination, Sample sample);
     }
 }
